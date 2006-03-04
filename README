@@ -1,4 +1,4 @@
-HTML::WikiConverter::MediaWiki version 0.50
+HTML::WikiConverter::MediaWiki version 0.51
 ===========================================
 
 HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
@@ -23,19 +23,15 @@ There's also a web interface if you're so inclined:
 
 VERSION
 
-This is HTML::WikiConverter::MediaWiki 0.50.
+This is HTML::WikiConverter::MediaWiki 0.51.
 
-Prior versions of HTML::WikiConverter supported the MediaWiki dialect
-out of the box. As of 0.50, each dialect was branched off into a
-separate CPAN package.
+CHANGES IN 0.51
 
-CHANGES IN 0.50
-
-  * MediaWiki dialect now has its own CPAN package
+  * Upgrade for HTML::WikiConverter 0.52
 
 DEPENDENCIES
 
-  * HTML::WikiConverter version 0.50
+  * HTML::WikiConverter version 0.52
 
 INSTALLATION
 

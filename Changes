@@ -1,5 +1,10 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.51
+date: Fri Mar 03 2006
+changes:
+  - Update to require H::WC 0.52
+
 version: 0.50
 date:    Tue Jan 10 2006
 changes:

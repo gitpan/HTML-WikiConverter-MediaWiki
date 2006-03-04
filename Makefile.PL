@@ -11,7 +11,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'URI' => 1.35,
-        'HTML::WikiConverter' => 0.50,
+        'HTML::WikiConverter' => 0.52,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'HTML-WikiConverter-MediaWiki-*' },

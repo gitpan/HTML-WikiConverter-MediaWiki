@@ -1,13 +1,12 @@
 package HTML::WikiConverter::MediaWiki;
+use HTML::WikiConverter -dialect;
 
 use warnings;
 use strict;
 
-use base 'HTML::WikiConverter';
-
 use URI;
 use File::Basename;
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 =head1 NAME
 
@@ -85,11 +84,8 @@ converted into
 
 =cut
 
-sub attributes { (
-  shift->SUPER::attributes,
-  preserve_bold => 0,
-  preserve_italic => 0
-) }
+attribute preserve_bold => { default => 0 };
+attribute preserve_italic => { default => 0 };
 
 my @common_attrs = qw/ id class lang dir title style /;
 my @block_attrs = ( @common_attrs, 'align' );
@@ -102,67 +98,59 @@ my @tablecell_attrs = qw(
 # Fix for bug 14527
 my $pre_prefix = '[jsmckaoqkjgbhazkfpwijhkixh]';
 
-sub rules {
+rule hr     => { replace => "\n----\n" };
+rule br     => { preserve => 1, empty => 1, attributes => [ qw/id class title style clear/ ] };
+rule p      => { block => 1, trim => 'both', line_format => 'multi' };
+rule em     => { start => "''", end => "''", line_format => 'single' };
+rule i      => { alias => 'em' };
+rule strong => { start => "'''", end => "'''", line_format => 'single' };
+rule b      => { alias => 'strong' };
+
+rule pre    => { line_prefix => $pre_prefix, block => 1 };
+
+rule table   => { start => \&_table_start, end => "|}", block => 1, line_format => 'blocks' };
+rule tr      => { start => \&_tr_start };
+rule td      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'blocks' };
+rule th      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'single' };
+rule caption => { start => \&_caption_start, end => "\n", line_format => 'single' };
+
+rule img => { replace => \&_image };
+rule a   => { replace => \&_link };
+
+rule ul => { line_format => 'multi', block => 1 };
+rule ol => { alias => 'ul' };
+rule dl => { alias => 'ul' };
+
+rule li => { start => \&_li_start, trim => 'leading' };
+rule dt => { alias => 'li' };
+rule dd => { alias => 'li' };
+
+# Preserved elements, from MediaWiki's Sanitizer.php (http://tinyurl.com/dzj6o)
+rule div        => { preserve => 1, attributes => \@block_attrs };
+rule span       => { alias => 'div' };
+rule blockquote => { preserve => 1, attributes => [ @common_attrs, qw/ cite / ] };
+rule del        => { preserve => 1, attributes => [ @common_attrs, qw/ cite datetime / ] };
+rule ins        => { alias => 'del' };
+rule font       => { preserve => 1, attributes => [ @common_attrs, qw/ size color face / ] };
+
+rule( $_ => { preserve => 1, attributes => \@common_attrs } )
+  foreach qw/ center cite code var sup sub tt big small strike s u ruby rb rt rp /;
+
+# Disallowed HTML tags
+rule( $_ => { replace => '' } )
+  foreach qw/ head title script style meta link object /;
+
+# Headings (h1-h6)
+foreach my $level ( 1..6 ) {
+  my $affix = ( '=' ) x $level;
+  rule "h$level" => { start => $affix.' ', end => ' '.$affix, block => 1, trim => 'both', line_format => 'single' };
+}
+
+sub _init {
   my $self = shift;
-
-  my %rules = (
-    hr => { replace => "\n----\n" },
-    br => { preserve => 1, empty => 1, attributes => [ qw/id class title style clear/ ] },
-
-    p      => { block => 1, trim => 'both', line_format => 'multi' },
-    em     => { start => "''", end => "''", line_format => 'single' },
-    i      => { alias => 'em' },
-    strong => { start => "'''", end => "'''", line_format => 'single' },
-    b      => { alias => 'strong' },
-
-    pre    => { line_prefix => $pre_prefix, block => 1 },
-
-    table   => { start => \&_table_start, end => "|}", block => 1, line_format => 'blocks' },
-    tr      => { start => \&_tr_start },
-    td      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'blocks' },
-    th      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'single' },
-    caption => { start => \&_caption_start, end => "\n", line_format => 'single' },
-
-    img => { replace => \&_image },
-    a   => { replace => \&_link },
-
-    ul => { line_format => 'multi', block => 1 },
-    ol => { alias => 'ul' },
-    dl => { alias => 'ul' },
-
-    li => { start => \&_li_start, trim => 'leading' },
-    dt => { alias => 'li' },
-    dd => { alias => 'li' },
-
-    # Preserved elements, from MediaWiki's Sanitizer.php
-    # http://tinyurl.com/dzj6o
-
-    div        => { preserve => 1, attributes => \@block_attrs },
-    span       => { alias => 'div' },
-    blockquote => { preserve => 1, attributes => [ @common_attrs, qw/ cite / ] },
-    del        => { preserve => 1, attributes => [ @common_attrs, qw/ cite datetime / ] },
-    ins        => { alias => 'del' },
-    font       => { preserve => 1, attributes => [ @common_attrs, qw/ size color face / ] },
-  );
-
-  $rules{$_} = { preserve => 1, attributes => \@common_attrs } for
-    qw/ center cite code var sup sub tt big small strike s u ruby rb rt rp /;
-
   # Preserve <i> and <b> instead of converting them to '' and ''', respectively
-  $rules{i} = { preserve => 1, attributes => \@common_attrs } if $self->preserve_italic;
-  $rules{b} = { preserve => 1, attributes => \@common_attrs } if $self->preserve_bold;
-
-  # Disallowed HTML tags
-  my @stripped_tags = qw/ head title script style meta link object /;
-  $rules{$_} = { replace => '' } foreach @stripped_tags;
-
-  # Headings (h1-h6)
-  foreach my $level ( 1..6 ) {
-    my $affix = ( '=' ) x $level;
-    $rules{"h$level"} = { start => $affix.' ', end => ' '.$affix, block => 1, trim => 'both', line_format => 'single' };
-  }
-
-  return \%rules;
+  rule( i => { preserve => 1, attributes => \@common_attrs } ) if $self->preserve_italic;
+  rule( b => { preserve => 1, attributes => \@common_attrs } ) if $self->preserve_bold;
 }
 
 sub postprocess_output {

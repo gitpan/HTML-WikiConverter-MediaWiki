@@ -1,4 +1,4 @@
-HTML::WikiConverter::MediaWiki version 0.51
+HTML::WikiConverter::MediaWiki version 0.52
 ===========================================
 
 HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
@@ -21,17 +21,16 @@ There's also a web interface if you're so inclined:
 
   http://diberri.dyndns.org/html2wiki.html
 
-VERSION
+CHANGES IN 0.52
 
-This is HTML::WikiConverter::MediaWiki 0.51.
-
-CHANGES IN 0.51
-
-  * Upgrade for HTML::WikiConverter 0.52
+  * (bug #19046) Allow lone '0' in text
+  * Upgrade for HTML::WikiConverter 0.54
+  * Add pad_headings attribute
 
 DEPENDENCIES
 
-  * HTML::WikiConverter version 0.52
+  * HTML::WikiConverter version 0.54
+  * URI
 
 INSTALLATION
 

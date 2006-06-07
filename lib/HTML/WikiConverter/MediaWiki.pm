@@ -1,12 +1,12 @@
 package HTML::WikiConverter::MediaWiki;
-use HTML::WikiConverter -dialect;
+use base 'HTML::WikiConverter';
 
 use warnings;
 use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 =head1 NAME
 
@@ -82,10 +82,13 @@ converted into
   * ''Italic''
   * ''Emphasized''
 
-=cut
+=head2 pad_headings
 
-attribute preserve_bold => { default => 0 };
-attribute preserve_italic => { default => 0 };
+Boolean indicating whether section headings should be padded with
+spaces (eg, "== Section ==" instead of "==Section=="). Default is
+to pad.
+
+=cut
 
 my @common_attrs = qw/ id class lang dir title style /;
 my @block_attrs = ( @common_attrs, 'align' );
@@ -98,59 +101,82 @@ my @tablecell_attrs = qw(
 # Fix for bug 14527
 my $pre_prefix = '[jsmckaoqkjgbhazkfpwijhkixh]';
 
-rule hr     => { replace => "\n----\n" };
-rule br     => { preserve => 1, empty => 1, attributes => [ qw/id class title style clear/ ] };
-rule p      => { block => 1, trim => 'both', line_format => 'multi' };
-rule em     => { start => "''", end => "''", line_format => 'single' };
-rule i      => { alias => 'em' };
-rule strong => { start => "'''", end => "'''", line_format => 'single' };
-rule b      => { alias => 'strong' };
+sub rules {
+  my $self = shift;
 
-rule pre    => { line_prefix => $pre_prefix, block => 1 };
+  my %rules = (
+    hr     => { replace => "\n----\n" },
+    br     => { preserve => 1, empty => 1, attributes => [ qw/id class title style clear/ ] },
+    p      => { block => 1, trim => 'both', line_format => 'single' },
+    em     => { start => "''", end => "''", line_format => 'single' },
+    strong => { start => "'''", end => "'''", line_format => 'single' },
 
-rule table   => { start => \&_table_start, end => "|}", block => 1, line_format => 'blocks' };
-rule tr      => { start => \&_tr_start };
-rule td      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'blocks' };
-rule th      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'single' };
-rule caption => { start => \&_caption_start, end => "\n", line_format => 'single' };
+    i      => { alias => 'em' },
+    b      => { alias => 'strong' },
 
-rule img => { replace => \&_image };
-rule a   => { replace => \&_link };
+    pre    => { line_prefix => $pre_prefix, block => 1 },
 
-rule ul => { line_format => 'multi', block => 1 };
-rule ol => { alias => 'ul' };
-rule dl => { alias => 'ul' };
+    table   => { start => \&_table_start, end => "|}", block => 1, line_format => 'blocks' },
+    tr      => { start => \&_tr_start },
+    td      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'blocks' },
+    th      => { start => \&_td_start, end => "\n", trim => 'both', line_format => 'single' },
+    caption => { start => \&_caption_start, end => "\n", line_format => 'single' },
 
-rule li => { start => \&_li_start, trim => 'leading' };
-rule dt => { alias => 'li' };
-rule dd => { alias => 'li' };
+    img => { replace => \&_image },
+    a   => { replace => \&_link },
 
-# Preserved elements, from MediaWiki's Sanitizer.php (http://tinyurl.com/dzj6o)
-rule div        => { preserve => 1, attributes => \@block_attrs };
-rule span       => { alias => 'div' };
-rule blockquote => { preserve => 1, attributes => [ @common_attrs, qw/ cite / ] };
-rule del        => { preserve => 1, attributes => [ @common_attrs, qw/ cite datetime / ] };
-rule ins        => { alias => 'del' };
-rule font       => { preserve => 1, attributes => [ @common_attrs, qw/ size color face / ] };
+    ul => { line_format => 'multi', block => 1 },
+    ol => { alias => 'ul' },
+    dl => { alias => 'ul' },
 
-rule( $_ => { preserve => 1, attributes => \@common_attrs } )
-  foreach qw/ center cite code var sup sub tt big small strike s u ruby rb rt rp /;
+    li => { start => \&_li_start, trim => 'leading' },
+    dt => { alias => 'li' },
+    dd => { alias => 'li' },
 
-# Disallowed HTML tags
-rule( $_ => { replace => '' } )
-  foreach qw/ head title script style meta link object /;
+    # Preserved elements, from MediaWiki's Sanitizer.php (http://tinyurl.com/dzj6o)
+    div        => { preserve => 1, attributes => \@block_attrs },
+    span       => { preserve => 1, attributes => \@block_attrs },
+    blockquote => { preserve => 1, attributes => [ @common_attrs, qw/ cite / ] },
+    del        => { preserve => 1, attributes => [ @common_attrs, qw/ cite datetime / ] },
+    ins        => { preserve => 1, attributes => [ @common_attrs, qw/ cite datetime / ] },
+    font       => { preserve => 1, attributes => [ @common_attrs, qw/ size color face / ] },
 
-# Headings (h1-h6)
-foreach my $level ( 1..6 ) {
-  my $affix = ( '=' ) x $level;
-  rule "h$level" => { start => $affix.' ', end => ' '.$affix, block => 1, trim => 'both', line_format => 'single' };
+    # Headings (h1-h6)
+    h1 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+    h2 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+    h3 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+    h4 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+    h5 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+    h6 => { start => \&_hr_start, end => \&_hr_end, block => 1, trim => 'both', line_format => 'single' },
+  );
+
+  my @preserved = qw/ center cite code var sup sub tt big small strike s u ruby rb rt rp /;
+  push @preserved, 'i' if $self->preserve_italic;
+  push @preserved, 'b' if $self->preserve_bold;
+  $rules{$_} = { preserve => 1, attributes => \@common_attrs } foreach @preserved;
+
+  return \%rules;
 }
 
-sub _init {
-  my $self = shift;
-  # Preserve <i> and <b> instead of converting them to '' and ''', respectively
-  rule( i => { preserve => 1, attributes => \@common_attrs } ) if $self->preserve_italic;
-  rule( b => { preserve => 1, attributes => \@common_attrs } ) if $self->preserve_bold;
+sub attributes { {
+  preserve_italic => { default => 0 },
+  preserve_bold => { default => 0 },
+  strip_tags => { default => [ qw/ head style script ~comment title meta link object / ] },
+  pad_headings => { default => 1 },
+} }
+
+sub _hr_start { 
+  my( $wc, $node, $subrules ) = @_;
+  ( my $level = $node->tag ) =~ s/\D//g;
+  my $affix = ('=') x $level;
+  return $wc->pad_headings ? "$affix " : $affix;
+}
+
+sub _hr_end {
+  my( $wc, $node, $subrules ) = @_;
+  ( my $level = $node->tag ) =~ s/\D//g;
+  my $affix = ('=') x $level;
+  return $wc->pad_headings ? " $affix" : $affix;
 }
 
 sub postprocess_output {
@@ -179,8 +205,8 @@ sub _li_start {
 
 sub _link {
   my( $self, $node, $rules ) = @_;
-  my $url = $node->attr('href') || '';
-  my $text = $self->get_elem_contents($node) || '';
+  my $url = defined $node->attr('href') ? $node->attr('href') : '';
+  my $text = $self->get_elem_contents($node);
 
   # Handle internal links
   if( my $title = $self->get_wiki_page( $url ) ) {
@@ -264,7 +290,7 @@ sub _caption_start {
 
 sub preprocess_node {
   my( $self, $node ) = @_;
-  my $tag = $node->tag || '';
+  my $tag = defined $node->tag ? $node->tag : '';
   $self->strip_aname($node) if $tag eq 'a';
   $self->_strip_extra($node);
   $self->_nowiki_text($node) if $tag eq '~text';
@@ -287,7 +313,7 @@ my @wikitext_patterns = (
 
 sub _nowiki_text {
   my( $self, $node ) = @_;
-  my $text = $node->attr('text') || '';
+  my $text = defined $node->attr('text') ? $node->attr('text') : '';
 
   my $found_wikitext = 0;
   foreach my $pat ( @wikitext_patterns ) {
@@ -311,10 +337,10 @@ my %extra = (
 # Delete <span class="urlexpansion">...</span> et al
 sub _strip_extra {
   my( $self, $node ) = @_;
-  my $tag = $node->tag || '';
+  my $tag = defined $node->tag ? $node->tag : '';
 
   foreach my $att_name ( keys %extra ) {
-    my $att_value = $node->attr($att_name) || '';
+    my $att_value = defined $node->attr($att_name) ? $node->attr($att_name) : '';
     if( $att_value =~ $extra{$att_name} ) {
       $node->detach();
       $node->delete();

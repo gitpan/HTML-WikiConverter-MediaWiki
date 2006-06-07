@@ -1,11 +1,18 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.52
+date: Wed June 07 16:00:00 EST 2006
+changes:
+  - (bug #19046) allow lone '0' in text
+  - add pad_headings attribute
+  - update to require H::WC 0.54
+
 version: 0.51
 date: Fri Mar 03 2006
 changes:
-  - Update to require H::WC 0.52
+  - update to require H::WC 0.52
 
 version: 0.50
 date:    Tue Jan 10 2006
 changes:
-  - Branched from main HTML::WikiConverter codebase.
+  - branched from main HTML::WikiConverter codebase.

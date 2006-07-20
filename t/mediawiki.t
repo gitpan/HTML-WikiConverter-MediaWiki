@@ -151,7 +151,7 @@ br attribs
 __H__
 <html>ok<br id="stuff" class="things" title="ok" style="clear:both" clear="both"></html>
 __W__
-ok<br id="stuff" class="things" title="ok" style="clear:both" clear="both" />
+ok<br id="stuff" class="things" title="ok" style="clear: both" clear="both" />
 __NEXT__
 wrap in html
 __H__
@@ -560,7 +560,7 @@ __W__
 __NEXT__
 strip editsection
 __H__
-<html>This is <div class="editsection" style="..."><a href="?action=edit&section=1">edit</a></div> great</html>
+<html>This is <div class="editsection"><a href="?action=edit&section=1">edit</a></div> great</html>
 __W__
 This is
 
@@ -590,7 +590,7 @@ __H__
 __W__
 <nowiki>= a line that looks like a section</nowiki>
 __NEXT__
-pre-many
+pre-many (bug #14527)
 __H__
 <html><pre>preformatted text
 
@@ -619,3 +619,18 @@ __W__
  more preformatted text
 
  once again
+__NEXT__
+preserve ::preserve_bold(1)
+__H__
+<b>hello</b>
+__W__
+<b>hello</b>
+__NEXT__
+hr under td
+__H__
+<table><tr><td><hr></td></tr></table>
+__W__
+{|
+|
+----
+|}

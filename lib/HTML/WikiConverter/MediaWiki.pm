@@ -6,7 +6,7 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 =head1 NAME
 
@@ -258,7 +258,7 @@ sub _tr_start {
 # List of tags (and pseudo-tags, in the case of '~text') that are
 # considered phrasal elements. Any table cells that contain only these
 # elements will be placed on a single line.
-my @td_phrasals = qw/ i em b strong u tt code span font sup sub br hr ~text s strike del ins /;
+my @td_phrasals = qw/ i em b strong u tt code span font sup sub br ~text s strike del ins /;
 my %td_phrasals = map { $_ => 1 } @td_phrasals;
 
 sub _td_start {

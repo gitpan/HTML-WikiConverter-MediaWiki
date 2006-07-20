@@ -1,5 +1,11 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.53
+date: Thu Jul 20 19:00:00 EST 2006
+changes:
+  - <hr> within <td> is now on own line (reported on [[wp:User_talk:Diberri]])
+  - require H::WC 0.60
+
 version: 0.52
 date: Wed June 07 16:00:00 EST 2006
 changes:

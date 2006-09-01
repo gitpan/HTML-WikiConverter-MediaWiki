@@ -1,4 +1,4 @@
-HTML::WikiConverter::MediaWiki version 0.53
+HTML::WikiConverter::MediaWiki version 0.54
 ===========================================
 
 HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
@@ -21,14 +21,13 @@ There's also a web interface if you're so inclined:
 
   http://diberri.dyndns.org/wikipedia/html2wiki/
 
-CHANGES IN 0.53
+CHANGES IN 0.54
 
-  * <hr> within <td> now gets placed on its own line
-  * Require HTML::WikiConverter 0.60
+  * Added alternate text for [[Image:]] markup
 
 DEPENDENCIES
 
-  * HTML::WikiConverter version 0.54
+  * HTML::WikiConverter version 0.60
   * URI
 
 INSTALLATION

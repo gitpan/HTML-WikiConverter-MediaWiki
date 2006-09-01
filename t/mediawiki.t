@@ -634,3 +634,9 @@ __W__
 |
 ----
 |}
+__NEXT__
+img alt
+__H__
+<img src="thing.gif" alt="Just a test" />
+__W__
+[[Image:thing.gif|Just a test]]

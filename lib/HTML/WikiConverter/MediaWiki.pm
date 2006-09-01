@@ -6,7 +6,7 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 =head1 NAME
 
@@ -224,7 +224,12 @@ sub _link {
 sub _image {
   my( $self, $node, $rules ) = @_;
   return '' unless $node->attr('src');
-  return '[[Image:'.basename( URI->new($node->attr('src'))->path ).']]';
+
+  my $alt = $node->attr('alt') || '';
+  my $img = basename( URI->new($node->attr('src'))->path );
+
+  return sprintf '[[Image:%s|%s]]', $img, $alt if $alt;
+  return sprintf '[[Image:%s]]', $img;
 }
 
 sub _table_start {

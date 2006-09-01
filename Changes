@@ -1,5 +1,10 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.54
+date: Thu Sep 1 00:00:00 EST 2006
+changes:
+  - Added alternate text for [[Image:]] markup
+
 version: 0.53
 date: Thu Jul 20 19:00:00 EST 2006
 changes:

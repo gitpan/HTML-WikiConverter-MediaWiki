@@ -6,7 +6,7 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 =head1 NAME
 
@@ -82,6 +82,18 @@ converted into
   * ''Italic''
   * ''Emphasized''
 
+=head2 preserve_templates
+
+Boolean indicating whether C<{{template}}> calls found in HTML should
+be preserved in the wiki markup. If disabled (the default), templates
+calls will be wrapped in C<E<lt>nowikiE<gt>> tags.
+
+=head2 preserve_nowiki
+
+Boolean indicating whether C<E<lt>nowikiE<gt>> tags found in HTML
+should be preserved in the wiki markup. If disabled (the default),
+nowiki tags will be replaced with their content.
+
 =head2 pad_headings
 
 Boolean indicating whether section headings should be padded with
@@ -153,6 +165,7 @@ sub rules {
   my @preserved = qw/ center cite code var sup sub tt big small strike s u ruby rb rt rp /;
   push @preserved, 'i' if $self->preserve_italic;
   push @preserved, 'b' if $self->preserve_bold;
+  push @preserved, 'nowiki' if $self->preserve_nowiki;
   $rules{$_} = { preserve => 1, attributes => \@common_attrs } foreach @preserved;
 
   return \%rules;
@@ -163,6 +176,8 @@ sub attributes { {
   preserve_bold => { default => 0 },
   strip_tags => { default => [ qw/ head style script ~comment title meta link object / ] },
   pad_headings => { default => 1 },
+  preserve_templates => { default => 0 },
+  preserve_nowiki => { default => 0 },
 } }
 
 sub _hr_start { 
@@ -307,21 +322,30 @@ my $EXT_LINK_TEXT_CLASS = '[^\]\\x00-\\x1F\\x7F]';
 
 # Text nodes matching one or more of these patterns will be enveloped
 # in <nowiki> and </nowiki>
-my @wikitext_patterns = (
-  qr/''/,
-  qr/^(?:\*|\#|\;|\:|\=|\!|\|)/m,
-  qr/^----/m,
-  qr/^\{\|/m,
-  qr/\[\[/m,
-  qr/{{/m,
-);
+
+sub _wikitext_patterns {
+  my $self = shift;
+
+  my %wikitext_patterns = (
+    italic   => qr/''/,
+    misc     => qr/^(?:\*|\#|\;|\:|\=|\!|\|)/m,
+    rule     => qr/^----/m,
+    table    => qr/^\{\|/m,
+    link     => qr/\[\[/m,
+    template => qr/{{/m,
+  );
+
+  delete $wikitext_patterns{template} if $self->preserve_templates;
+
+  return values %wikitext_patterns;
+}
 
 sub _nowiki_text {
   my( $self, $node ) = @_;
   my $text = defined $node->attr('text') ? $node->attr('text') : '';
 
   my $found_wikitext = 0;
-  foreach my $pat ( @wikitext_patterns ) {
+  foreach my $pat ( $self->_wikitext_patterns ) {
     $found_wikitext++, last if $text =~ $pat;
   }
 

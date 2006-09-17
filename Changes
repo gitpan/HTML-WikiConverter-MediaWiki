@@ -1,5 +1,11 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.55
+date: Sun Sep 17 11:00:00 EST 2006
+changes:
+  - (bug #21531) Added 'preserve_nowiki' attribute
+  - Added 'preserve_templates' attribute (for the TinyMCE folks; see http://meta.wikimedia.org/wiki/TinyMCE)
+
 version: 0.54
 date: Thu Sep 1 00:00:00 EST 2006
 changes:

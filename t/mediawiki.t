@@ -640,3 +640,26 @@ __H__
 <img src="thing.gif" alt="Just a test" />
 __W__
 [[Image:thing.gif|Just a test]]
+__NEXT__
+no preserve templates ::preserve_templates(0)
+__H__
+{{template}}
+__W__
+<nowiki>{{template}}</nowiki>
+__NEXT__
+preserve templates ::preserve_templates(1)
+{{template}}
+__W__
+{{template}}
+__NEXT__
+no preserve nowiki ::preserve_nowiki(0)
+__H__
+<nowiki>hey</nowiki>
+__W__
+hey
+__NEXT__
+preserve nowiki ::preserve_nowiki(1)
+__H__
+<nowiki>hey</nowiki>
+__W__
+<nowiki>hey</nowiki>

@@ -1,4 +1,4 @@
-HTML::WikiConverter::MediaWiki version 0.54
+HTML::WikiConverter::MediaWiki version 0.55
 ===========================================
 
 HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
@@ -21,9 +21,10 @@ There's also a web interface if you're so inclined:
 
   http://diberri.dyndns.org/wikipedia/html2wiki/
 
-CHANGES IN 0.54
+CHANGES IN 0.55
 
-  * Added alternate text for [[Image:]] markup
+  * Added 'preserve_templates' attribute
+  * Added 'preserve_nowiki' attribute
 
 DEPENDENCIES
 

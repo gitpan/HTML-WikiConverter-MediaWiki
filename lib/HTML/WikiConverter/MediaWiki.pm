@@ -6,7 +6,7 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 =head1 NAME
 
@@ -178,6 +178,9 @@ sub attributes { {
   pad_headings => { default => 1 },
   preserve_templates => { default => 0 },
   preserve_nowiki => { default => 0 },
+
+  # see bug #28402
+  passthrough_naked_tags => { default => [ qw/ tbody thead font / ] },
 } }
 
 sub _hr_start { 
@@ -242,7 +245,9 @@ sub _image {
 
   my $alt = $node->attr('alt') || '';
   my $img = basename( URI->new($node->attr('src'))->path );
+  my $width = $node->attr('width') || '';
 
+  return sprintf '[[Image:%s|%spx|%s]]', $img, $width, $alt if $alt and $width;
   return sprintf '[[Image:%s|%s]]', $img, $alt if $alt;
   return sprintf '[[Image:%s]]', $img;
 }

@@ -663,3 +663,68 @@ __H__
 <nowiki>hey</nowiki>
 __W__
 <nowiki>hey</nowiki>
+__NEXT__
+preserve image width
+__H__
+<img src="thing.jpg" width="200" height="400" alt="The Thing" />
+__W__
+[[Image:thing.jpg|200px|The Thing]]
+__NEXT__
+tbody and thead fixes (bug #28402)
+__H__
+<table border="1">
+<colgroup>
+<col />
+<col />
+<col />
+</colgroup>
+<thead>
+<tr>
+<th>heading col 1</th>
+<th>heading col 2</th>
+<th>heading last col</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>data first col first row</td>
+<td>data c2 r1</td>
+<td>data c3 r1</td>
+</tr>
+<tr>
+<td>data c1 r2</td>
+<td>data c2 r2</td>
+<td>data c3 r2</td>
+</tr>
+<tr>
+<td>data c1 r3</td>
+<td>data c2 r3</td>
+<td>data c3 r3</td>
+</tr>
+</tbody>
+</table>
+__W__
+{| border="1"
+|-
+! heading col 1
+! heading col 2
+! heading last col
+|-
+| data first col first row
+| data c2 r1
+| data c3 r1
+|-
+| data c1 r2
+| data c2 r2
+| data c3 r2
+|-
+| data c1 r3
+| data c2 r3
+| data c3 r3
+|}
+__NEXT__
+don't pad headings ::pad_headings(0)
+__H__
+<h2>Heading</h2>
+__W__
+==Heading==

@@ -1,5 +1,14 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.56
+date: 2008-11-11
+changes:
+  - (bug #28402) add tbody, thead, font to passthrough_naked_tags
+  - preserve image width in [[Image:]] markup
+  - update 'table w/ blocks' test now that H::WC 0.63 properly supports nested blocks
+  - now requires H::WC 0.63 (for the above test)
+  - add author/license to META.yml
+
 version: 0.55
 date: Sun Sep 17 11:00:00 EST 2006
 changes:

@@ -6,7 +6,7 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ nowiki tags will be replaced with their content.
 
 Boolean indicating whether section headings should be padded with
 spaces (eg, "== Section ==" instead of "==Section=="). Default is
-to pad.
+false (ie, not to pad).
 
 =cut
 
@@ -175,12 +175,13 @@ sub attributes { {
   preserve_italic => { default => 0 },
   preserve_bold => { default => 0 },
   strip_tags => { default => [ qw/ head style script ~comment title meta link object / ] },
-  pad_headings => { default => 1 },
+  pad_headings => { default => 0 },
   preserve_templates => { default => 0 },
   preserve_nowiki => { default => 0 },
 
   # see bug #28402
-  passthrough_naked_tags => { default => [ qw/ tbody thead font / ] },
+# xxx  passthrough_naked_tags => { default => [ qw/ tbody thead font / ] },
+  passthrough_naked_tags => { default => [ qw/ tbody thead font span / ] },
 } }
 
 sub _hr_start { 
@@ -319,6 +320,9 @@ sub preprocess_node {
   $self->strip_aname($node) if $tag eq 'a';
   $self->_strip_extra($node);
   $self->_nowiki_text($node) if $tag eq '~text';
+  
+#  # XXX font-to-span convers
+#  $node->tag('span') if $tag eq 'font';
 }
 
 my $URL_PROTOCOLS = 'http|https|ftp|irc|gopher|news|mailto';

@@ -1,5 +1,12 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.57
+date: 2009-03-06
+changes:
+  - no longer pad section headings by default
+  - add new span/font tests, marked as TODO
+  - add perl license to Makefile.PL
+
 version: 0.56
 date: 2008-11-11
 changes:

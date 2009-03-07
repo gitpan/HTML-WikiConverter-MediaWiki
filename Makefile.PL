@@ -7,6 +7,7 @@ WriteMakefile(
     AUTHOR              => 'David J. Iberri <diberri@cpan.org>',
     VERSION_FROM        => 'lib/HTML/WikiConverter/MediaWiki.pm',
     ABSTRACT_FROM       => 'lib/HTML/WikiConverter/MediaWiki.pm',
+    LICENSE             => 'perl',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,

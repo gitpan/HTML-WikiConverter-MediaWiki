@@ -1,5 +1,10 @@
 # Change log for HTML::WikiConverter::MediaWiki
 
+version: 0.58
+date: 2009-03-06
+changes:
+  - fix manifest
+
 version: 0.57
 date: 2009-03-06
 changes:

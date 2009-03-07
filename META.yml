@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               HTML-WikiConverter-MediaWiki
-version:            0.57
+version:            0.58
 abstract:           Convert HTML to MediaWiki markup
 author:
     - David J. Iberri <diberri@cpan.org>

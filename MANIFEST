@@ -5,8 +5,8 @@ Makefile.PL
 README
 lib/HTML/WikiConverter/MediaWiki.pm
 t/00-load.t
+t/01-mediawiki.t
 t/boilerplate.t
-t/mediawiki.t
 t/mediawiki.preserve.t
 t/pod-coverage.t
 t/pod.t

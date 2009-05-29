@@ -1,9 +1,8 @@
-HTML::WikiConverter::MediaWiki version 0.55
-===========================================
+HTML::WikiConverter::MediaWiki
+==============================
 
 HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
-HTML::WikiConverter allowing the conversion of HTML to MediaWiki
-markup.
+HTML::WikiConverter allowing conversion from HTML to MediaWiki markup.
 
 SYNOPSIS
 
@@ -19,17 +18,7 @@ Or from the command line:
 
 There's also a web interface if you're so inclined:
 
-  http://diberri.dyndns.org/wikipedia/html2wiki/
-
-CHANGES IN 0.55
-
-  * Added 'preserve_templates' attribute
-  * Added 'preserve_nowiki' attribute
-
-DEPENDENCIES
-
-  * HTML::WikiConverter version 0.60
-  * URI
+  http://toolserver.org/~diberri/cgi-bin/html2wiki/
 
 INSTALLATION
 
@@ -63,7 +52,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006 David J. Iberri
+Copyright (c) David J. Iberri
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

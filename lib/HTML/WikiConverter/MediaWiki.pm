@@ -6,7 +6,8 @@ use strict;
 
 use URI;
 use File::Basename;
-our $VERSION = '0.58';
+use HTML::Tagset;
+our $VERSION = '0.59';
 
 =head1 NAME
 
@@ -335,36 +336,75 @@ my $EXT_LINK_TEXT_CLASS = '[^\]\\x00-\\x1F\\x7F]';
 sub _wikitext_patterns {
   my $self = shift;
 
+  # the caret in "qr/^/" seems redundant with "start_of_line" but both
+  # are necessary
   my %wikitext_patterns = (
-    italic   => qr/''/,
-    misc     => qr/^(?:\*|\#|\;|\:|\=|\!|\|)/m,
-    rule     => qr/^----/m,
-    table    => qr/^\{\|/m,
-    link     => qr/\[\[/m,
-    template => qr/{{/m,
+    misc     => { pattern => qr/^(?:\*|\#|\;|\:|\=|\!|\|)/m, location => 'start_of_line' },
+    italic   => { pattern => qr/''/,     location => 'anywhere' },
+    rule     => { pattern => qr/^----/m, location => 'start_of_line' },
+    table    => { pattern => qr/^\{\|/m, location => 'start_of_line' },
+    link     => { pattern => qr/\[\[/m,  location => 'anywhere' },
+    template => { pattern => qr/{{/m,    location => 'anywhere' },
   );
 
   delete $wikitext_patterns{template} if $self->preserve_templates;
-
-  return values %wikitext_patterns;
+  return \%wikitext_patterns;
 }
 
 sub _nowiki_text {
   my( $self, $node ) = @_;
+
   my $text = defined $node->attr('text') ? $node->attr('text') : '';
+  return unless $text;
 
-  my $found_wikitext = 0;
-  foreach my $pat ( $self->_wikitext_patterns ) {
-    $found_wikitext++, last if $text =~ $pat;
-  }
+  my $wikitext_patterns = $self->_wikitext_patterns;
+  my $found_nowiki_text = 0;
 
-  if( $found_wikitext ) {
+  ANYWHERE: {
+    my @anywhere_patterns =
+      map { $_->{pattern} } grep { $_->{location} eq 'anywhere' } values %$wikitext_patterns;
+
+    $found_nowiki_text++ if $self->_match( $text, \@anywhere_patterns );
+  };
+
+  START_OF_LINE: {
+    last if $found_nowiki_text;
+
+    my @sol_patterns =
+      map { $_->{pattern} } grep { $_->{location} eq 'start_of_line' } values %$wikitext_patterns;
+
+    # find closest parent that is a block-level node
+    my $nearest_parent_block = $self->elem_search_lineage( $node, { block => 1 } );
+
+    if( $nearest_parent_block ) {
+      my $leftmostish_text_node = $self->_get_leftmostish_text_node( $nearest_parent_block );
+      if( $leftmostish_text_node and $node == $leftmostish_text_node ) {
+        # I'm the first child in this block element, so let's apply start_of_line nowiki fixes
+        $found_nowiki_text++ if $self->_match( $text, \@sol_patterns );
+      }
+    }
+  };
+
+  if( $found_nowiki_text ) {
     $text = "<nowiki>$text</nowiki>";
   } else {
     $text =~ s~(\[\b(?:$URL_PROTOCOLS):$EXT_LINK_URL_CLASS+ *$EXT_LINK_TEXT_CLASS*?\])~<nowiki>$1</nowiki>~go;
   }
 
   $node->attr( text => $text );
+}
+
+sub _get_leftmostish_text_node {
+  my( $self, $node ) = @_;
+  return unless $node;
+  return $node if $node->tag eq '~text';
+  return $self->_get_leftmostish_text_node( ($node->content_list)[0] )
+}
+
+sub _match {
+  my( $self, $text, $patterns ) = @_;
+  $text =~ $_ && return 1 for @$patterns;
+  return 0;
 }
 
 my %extra = (

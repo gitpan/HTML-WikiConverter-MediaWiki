@@ -84,6 +84,42 @@ __H__
 __W__
 <nowiki>[http://example.com]</nowiki>
 __NEXT__
+(bug #46453) triggering <nowiki> too often
+__H__
+<em>x</em>:bla
+__W__
+''x'':bla
+__NEXT__
+do not add a <nowiki> tag only if offending character(s) occur at the beginning of text node
+__H__
+<p>text <strong>*</strong>
+<p>text <strong>#</strong>
+<p>text <strong>;</strong>
+<p>text <strong>:</strong>
+<p>text <strong>=</strong>
+<p>text <strong>!</strong>
+<p>text <strong>|</strong>
+<p>text <strong>----</strong>
+<p>text <strong>{|</strong>
+__W__
+text '''*'''
+
+text '''#'''
+
+text ''';'''
+
+text ''':'''
+
+text '''='''
+
+text '''!'''
+
+text '''|'''
+
+text '''----'''
+
+text '''{|'''
+__NEXT__
 tr attributes
 __H__
 <html><table><tr align="left" valign="top"><td>ok</td></tr></table></html>
@@ -783,3 +819,14 @@ __H__
 <p><span style='font-size:40.0pt; font-family:"ArialNarrow"'>The Test Header</span></p>
 __W__
 <span style="font-size:40pt; font-family:ArialNarrow">The Test Header</span>
+__NEXT__
+(bug #29342) Tag attributes with 0 ::TODO("this is actually an H::WC-specific bug")
+__H__
+<table cellspacing="0" cellpadding="3" border="1">
+<tr><td>Hello</td><td>World</td></tr>
+</table>
+__W__
+{| border="1" cellpadding="3" cellspacing="0"
+| Hello
+| World
+|}
